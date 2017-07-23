@@ -12,4 +12,4 @@
 - Every row represents Mb type, followed by the list of Mb types this middlebox is re-order compatible with.
 
 4. vn.topo represents the Flow; 
-- It consists of <flow index, index of ingress node, index of egress node, list of middlebox types that describe the chain>
+- It consists of <flow index, index of ingress node, index of egress node, bw demand, list of middlebox types that describe the chain>
