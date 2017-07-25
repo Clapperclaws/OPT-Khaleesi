@@ -2,13 +2,14 @@ import java.util.ArrayList;
 
 public class Flow {
 	
-	
+	private int id;
 	private int source;
 	private int destination;
 	private int bw;
 	private ArrayList<Integer> chain;
 	
-	public Flow(int src, int dst, int bw){
+	public Flow(int id, int src, int dst, int bw){
+		this.id     = id;
 		this.source = src;
 		this.destination = dst;
 		this.bw = bw;
@@ -29,6 +30,14 @@ public class Flow {
 
 	public void setDestination(int destination) {
 		this.destination = destination;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public int getBw() {
