@@ -39,7 +39,7 @@ public class Graph {
     }
 
     // Get the bandwidth of an incident link
-    public int getBW(int source, int destination) {
+    public long getBW(int source, int destination) {
 
         ArrayList<EndPoint> endPoints = adjList[source];
         for (int i = 0; i < endPoints.size(); i++) {

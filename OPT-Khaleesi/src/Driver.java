@@ -204,9 +204,9 @@ public class Driver {
 				} else {
 					// Populate Links Specs
 					EndPoint e1 = new EndPoint(Integer.parseInt(splitLine[2]),
-					    Integer.parseInt(splitLine[3]), nodeType);
+					    Long.parseLong(splitLine[3]), nodeType);
 					EndPoint e2 = new EndPoint(Integer.parseInt(splitLine[1]),
-					    Integer.parseInt(splitLine[3]), nodeType);
+					    Long.parseLong(splitLine[3]), nodeType);
 					g.getAllEndPoints(Integer.parseInt(splitLine[1])).add(e1);
 					g.getAllEndPoints(Integer.parseInt(splitLine[2])).add(e2);
 				}
