@@ -554,7 +554,7 @@ Subject To
  IloC445#445:                    - x40 + q40 <= 0
  IloC446#446:                    - y40 + q40 <= 0
  IloC447#447:                    - x40 - y40 + q40 >= -1
- InternalSwitchingCapacity_0#448: q00 + q10 + q20 + q30 + q40 <= 2
+ InternalSwitchingCapacity_0#448: 5 q00 + 5 q10 + 5 q20 + 5 q30 + 5 q40 <= 2
  IloC449#449:                    - x01 + q01 <= 0
  IloC450#450:                    - y01 + q01 <= 0
  IloC451#451:                    - x01 - y01 + q01 >= -1
@@ -570,7 +570,7 @@ Subject To
  IloC461#461:                    - x41 + q41 <= 0
  IloC462#462:                    - y41 + q41 <= 0
  IloC463#463:                    - x41 - y41 + q41 >= -1
- InternalSwitchingCapacity_1#464: q01 + q11 + q21 + q31 + q41 <= 3
+ InternalSwitchingCapacity_1#464: 5 q01 + 5 q11 + 5 q21 + 5 q31 + 5 q41 <= 3
  IloC465#465:                    - x02 + q02 <= 0
  IloC466#466:                    - y02 + q02 <= 0
  IloC467#467:                    - x02 - y02 + q02 >= -1
@@ -586,7 +586,7 @@ Subject To
  IloC477#477:                    - x42 + q42 <= 0
  IloC478#478:                    - y42 + q42 <= 0
  IloC479#479:                    - x42 - y42 + q42 >= -1
- InternalSwitchingCapacity_2#480: q02 + q12 + q22 + q32 + q42 <= 4
+ InternalSwitchingCapacity_2#480: 5 q02 + 5 q12 + 5 q22 + 5 q32 + 5 q42 <= 4
  IloC481#481:                    - x03 + q03 <= 0
  IloC482#482:                    - y03 + q03 <= 0
  IloC483#483:                    - x03 - y03 + q03 >= -1
@@ -602,7 +602,7 @@ Subject To
  IloC493#493:                    - x43 + q43 <= 0
  IloC494#494:                    - y43 + q43 <= 0
  IloC495#495:                    - x43 - y43 + q43 >= -1
- InternalSwitchingCapacity_3#496: q03 + q13 + q23 + q33 + q43 <= 5
+ InternalSwitchingCapacity_3#496: 5 q03 + 5 q13 + 5 q23 + 5 q33 + 5 q43 <= 5
  IloC497#497:                    - x04 + q04 <= 0
  IloC498#498:                    - y04 + q04 <= 0
  IloC499#499:                    - x04 - y04 + q04 >= -1
@@ -618,7 +618,7 @@ Subject To
  IloC509#509:                    - x44 + q44 <= 0
  IloC510#510:                    - y44 + q44 <= 0
  IloC511#511:                    - x44 - y44 + q44 >= -1
- InternalSwitchingCapacity_4#512: q04 + q14 + q24 + q34 + q44 <= 6
+ InternalSwitchingCapacity_4#512: 5 q04 + 5 q14 + 5 q24 + 5 q34 + 5 q44 <= 6
  IloC513#513:                    - x05 + q05 <= 0
  IloC514#514:                    - y05 + q05 <= 0
  IloC515#515:                    - x05 - y05 + q05 >= -1
@@ -634,7 +634,7 @@ Subject To
  IloC525#525:                    - x45 + q45 <= 0
  IloC526#526:                    - y45 + q45 <= 0
  IloC527#527:                    - x45 - y45 + q45 >= -1
- InternalSwitchingCapacity_5#528: q05 + q15 + q25 + q35 + q45 <= 7
+ InternalSwitchingCapacity_5#528: 5 q05 + 5 q15 + 5 q25 + 5 q35 + 5 q45 <= 7
  IloC529#529:                    - x06 + q06 <= 0
  IloC530#530:                    - y06 + q06 <= 0
  IloC531#531:                    - x06 - y06 + q06 >= -1
@@ -650,7 +650,7 @@ Subject To
  IloC541#541:                    - x46 + q46 <= 0
  IloC542#542:                    - y46 + q46 <= 0
  IloC543#543:                    - x46 - y46 + q46 >= -1
- InternalSwitchingCapacity_6#544: q06 + q16 + q26 + q36 + q46 <= 0
+ InternalSwitchingCapacity_6#544: 5 q06 + 5 q16 + 5 q26 + 5 q36 + 5 q46 <= 0
  IloC545#545:                    - x07 + q07 <= 0
  IloC546#546:                    - y07 + q07 <= 0
  IloC547#547:                    - x07 - y07 + q07 >= -1
@@ -666,7 +666,7 @@ Subject To
  IloC557#557:                    - x47 + q47 <= 0
  IloC558#558:                    - y47 + q47 <= 0
  IloC559#559:                    - x47 - y47 + q47 >= -1
- InternalSwitchingCapacity_7#560: q07 + q17 + q27 + q37 + q47 <= 0
+ InternalSwitchingCapacity_7#560: 5 q07 + 5 q17 + 5 q27 + 5 q37 + 5 q47 <= 0
  IloC561#561:                    - x08 + q08 <= 0
  IloC562#562:                    - y08 + q08 <= 0
  IloC563#563:                    - x08 - y08 + q08 >= -1
@@ -682,7 +682,7 @@ Subject To
  IloC573#573:                    - x48 + q48 <= 0
  IloC574#574:                    - y48 + q48 <= 0
  IloC575#575:                    - x48 - y48 + q48 >= -1
- InternalSwitchingCapacity_8#576: q08 + q18 + q28 + q38 + q48 <= 0
+ InternalSwitchingCapacity_8#576: 5 q08 + 5 q18 + 5 q28 + 5 q38 + 5 q48 <= 0
  IloC577#577:                    - x09 + q09 <= 0
  IloC578#578:                    - y09 + q09 <= 0
  IloC579#579:                    - x09 - y09 + q09 >= -1
@@ -698,37 +698,37 @@ Subject To
  IloC589#589:                    - x49 + q49 <= 0
  IloC590#590:                    - y49 + q49 <= 0
  IloC591#591:                    - x49 - y49 + q49 >= -1
- InternalSwitchingCapacity_9#592: q09 + q19 + q29 + q39 + q49 <= 0
- LinkCapacity06#593:             w660 + w606 + w560 + w506 + w460 + w406 + w360
-                                 + w306 + w260 + w206 + w160 + w106 + w060
-                                 + w006 <= 10
- LinkCapacity16#594:             w661 + w616 + w561 + w516 + w461 + w416 + w361
-                                 + w316 + w261 + w216 + w161 + w116 + w061
-                                 + w016 <= 10
- LinkCapacity28#595:             w682 + w628 + w582 + w528 + w482 + w428 + w382
-                                 + w328 + w282 + w228 + w182 + w128 + w082
-                                 + w028 <= 10
- LinkCapacity38#596:             w683 + w638 + w583 + w538 + w483 + w438 + w383
-                                 + w338 + w283 + w238 + w183 + w138 + w083
-                                 + w038 <= 10
- LinkCapacity49#597:             w694 + w649 + w594 + w549 + w494 + w449 + w394
-                                 + w349 + w294 + w249 + w194 + w149 + w094
-                                 + w049 <= 10
- LinkCapacity59#598:             w695 + w659 + w595 + w559 + w495 + w459 + w395
-                                 + w359 + w295 + w259 + w195 + w159 + w095
-                                 + w059 <= 10
- LinkCapacity67#599:             w676 + w667 + w576 + w567 + w476 + w467 + w376
-                                 + w367 + w276 + w267 + w176 + w167 + w076
-                                 + w067 <= 10
- LinkCapacity78#600:             w687 + w678 + w587 + w578 + w487 + w478 + w387
-                                 + w378 + w287 + w278 + w187 + w178 + w087
-                                 + w078 <= 10
- LinkCapacity79#601:             w697 + w679 + w597 + w579 + w497 + w479 + w397
-                                 + w379 + w297 + w279 + w197 + w179 + w097
-                                 + w079 <= 10
- LinkCapacity89#602:             w698 + w689 + w598 + w589 + w498 + w489 + w398
-                                 + w389 + w298 + w289 + w198 + w189 + w098
-                                 + w089 <= 10
+ InternalSwitchingCapacity_9#592: 5 q09 + 5 q19 + 5 q29 + 5 q39 + 5 q49 <= 0
+ LinkCapacity06#593:             5 w660 + 5 w606 + 5 w560 + 5 w506 + 5 w460
+                                 + 5 w406 + 5 w360 + 5 w306 + 5 w260 + 5 w206
+                                 + 5 w160 + 5 w106 + 5 w060 + 5 w006 <= 10
+ LinkCapacity16#594:             5 w661 + 5 w616 + 5 w561 + 5 w516 + 5 w461
+                                 + 5 w416 + 5 w361 + 5 w316 + 5 w261 + 5 w216
+                                 + 5 w161 + 5 w116 + 5 w061 + 5 w016 <= 10
+ LinkCapacity28#595:             5 w682 + 5 w628 + 5 w582 + 5 w528 + 5 w482
+                                 + 5 w428 + 5 w382 + 5 w328 + 5 w282 + 5 w228
+                                 + 5 w182 + 5 w128 + 5 w082 + 5 w028 <= 10
+ LinkCapacity38#596:             5 w683 + 5 w638 + 5 w583 + 5 w538 + 5 w483
+                                 + 5 w438 + 5 w383 + 5 w338 + 5 w283 + 5 w238
+                                 + 5 w183 + 5 w138 + 5 w083 + 5 w038 <= 10
+ LinkCapacity49#597:             5 w694 + 5 w649 + 5 w594 + 5 w549 + 5 w494
+                                 + 5 w449 + 5 w394 + 5 w349 + 5 w294 + 5 w249
+                                 + 5 w194 + 5 w149 + 5 w094 + 5 w049 <= 10
+ LinkCapacity59#598:             5 w695 + 5 w659 + 5 w595 + 5 w559 + 5 w495
+                                 + 5 w459 + 5 w395 + 5 w359 + 5 w295 + 5 w259
+                                 + 5 w195 + 5 w159 + 5 w095 + 5 w059 <= 10
+ LinkCapacity67#599:             5 w676 + 5 w667 + 5 w576 + 5 w567 + 5 w476
+                                 + 5 w467 + 5 w376 + 5 w367 + 5 w276 + 5 w267
+                                 + 5 w176 + 5 w167 + 5 w076 + 5 w067 <= 10
+ LinkCapacity78#600:             5 w687 + 5 w678 + 5 w587 + 5 w578 + 5 w487
+                                 + 5 w478 + 5 w387 + 5 w378 + 5 w287 + 5 w278
+                                 + 5 w187 + 5 w178 + 5 w087 + 5 w078 <= 10
+ LinkCapacity79#601:             5 w697 + 5 w679 + 5 w597 + 5 w579 + 5 w497
+                                 + 5 w479 + 5 w397 + 5 w379 + 5 w297 + 5 w279
+                                 + 5 w197 + 5 w179 + 5 w097 + 5 w079 <= 10
+ LinkCapacity89#602:             5 w698 + 5 w689 + 5 w598 + 5 w589 + 5 w498
+                                 + 5 w489 + 5 w398 + 5 w389 + 5 w298 + 5 w289
+                                 + 5 w198 + 5 w189 + 5 w098 + 5 w089 <= 10
  IloC603#603:                    gamma021 - delta02 <= 0
  IloC604#604:                    gamma021 - delta21 <= 0
  IloC605#605:                    gamma021 - delta02 - delta21 >= -1
