@@ -26,9 +26,10 @@ public class Driver {
 
 	public static void main(String[] args) throws IOException, IloException {
 		HashMap<String, String> parsedArgs = ParseArgs(args);
-		
+
 		// Read Substrate Network
-		Graph substrateNetwork = ReadTopology(parsedArgs.get("--sn_topology_file"), -1);
+		Graph substrateNetwork = ReadTopology(parsedArgs.get("--sn_topology_file"),
+		    -1);
 		System.out.println("Substrate Network \n" + substrateNetwork);
 
 		// Read List of Flows
@@ -38,7 +39,7 @@ public class Driver {
 		// Read Middlebox Specs
 		int[] mbSpecs = ReadMBSpecs(parsedArgs.get("--mbox_spec_file"));
 		System.out.println("MB demands \n" + Arrays.toString(mbSpecs));
-
+		String logPrefix = parsedArgs.get("--log_prefix");
 		// Read RCM
 		int[][] rcm = ReadRCM(parsedArgs.get("--rcm_file"), mbSpecs.length);
 		System.out.print("ReadOrderCompatibilityMatrix \n");
@@ -46,10 +47,13 @@ public class Driver {
 			System.out.println(Arrays.toString(rcm[i]));
 		}
 
-		ArrayList<Tuple> vLinks = generateE(flowsList.get(0), rcm);
-		System.out.println(vLinks);
 		ILP model = new ILP();
-		model.runILP(substrateNetwork, rcm, flowsList.get(0), vLinks, mbSpecs);
+		for (int flowIdx = 0; flowIdx < flowsList.size(); ++flowIdx) {
+			ArrayList<Tuple> vLinks = generateE(flowsList.get(0), rcm);
+			System.out.println(vLinks);
+			model.runILP(substrateNetwork, rcm, flowIdx, flowsList.get(flowIdx),
+			    vLinks, mbSpecs, logPrefix);			
+		}
 	}
 
 	public static ArrayList<Tuple> generateE(Flow f, int[][] M) {

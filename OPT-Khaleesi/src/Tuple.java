@@ -42,5 +42,9 @@ public class Tuple {
 	public String toString(){
 		return "("+source+","+destination+")";
 	}
-
+	
+	public int compareTo(Tuple t) {
+		if (source != t.source) return source - t.source;
+		return destination - t.destination;
+	}
 }
