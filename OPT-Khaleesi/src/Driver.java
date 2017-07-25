@@ -31,20 +31,20 @@ public class Driver {
 		HashMap<String, String> parsedArgs = ParseArgs(args);
 
 		// Read Substrate Network
-		Graph substrateNetwork = ReadTopology(parsedArgs.get("--sn_topology_file"),
-		    -1);
+		Graph substrateNetwork = ReadTopology("Dataset/univ2.topo", -1);/*parsedArgs.get("--sn_topology_file"),
+		   // -1);*/
 		System.out.println("Substrate Network \n" + substrateNetwork);
 
 		// Read List of Flows
-		ArrayList<Flow> flowsList = ReadFlows(parsedArgs.get("--flows_file"));
+		ArrayList<Flow> flowsList = ReadFlows("Dataset/traffic-request-khaleesi.dc"/*parsedArgs.get("--flows_file")*/);
 		System.out.println("List of Flows: \n" + flowsList);
 
 		// Read Middlebox Specs
-		int[] mbSpecs = ReadMBSpecs(parsedArgs.get("--mbox_spec_file"));
+		int[] mbSpecs = ReadMBSpecs("Dataset/mbox-spec-khaleesi"/*parsedArgs.get("--mbox_spec_file")*/);
 		System.out.println("MB demands \n" + Arrays.toString(mbSpecs));
-		String logPrefix = parsedArgs.get("--log_prefix");
+		String logPrefix = "Dataset/log.ilp.dc";/*parsedArgs.get("--log_prefix");*/
 		// Read RCM
-		int[][] rcm = ReadRCM(parsedArgs.get("--rcm_file"), mbSpecs.length);
+		int[][] rcm = ReadRCM("Dataset/mbox-rc-khaleesi"/*parsedArgs.get("--rcm_file")*/, mbSpecs.length);
 		System.out.print("ReadOrderCompatibilityMatrix \n");
 		for (int i = 0; i < rcm.length; i++) {
 			System.out.println(Arrays.toString(rcm[i]));
@@ -67,7 +67,7 @@ public class Driver {
 		durationWriter.close();
 		ILP model = new ILP();
 		for (int flowIdx = 0; flowIdx < flowsList.size(); ++flowIdx) {
-			ArrayList<Tuple> vLinks = generateE(flowsList.get(0), rcm);
+			ArrayList<Tuple> vLinks = generateE(flowsList.get(flowIdx), rcm);
 			System.out.println(vLinks);
 			model.runILP(substrateNetwork, rcm, flowIdx, flowsList.get(flowIdx),
 			    vLinks, mbSpecs, logPrefix);			
@@ -75,6 +75,7 @@ public class Driver {
 	}
 
 	public static ArrayList<Tuple> generateE(Flow f, int[][] M) {
+		System.out.println("Flow "+f.getId());
 		ArrayList<Tuple> vLinks = new ArrayList<Tuple>();
 
 		// Add Links in the Original Chain
@@ -96,8 +97,7 @@ public class Driver {
 
 				}
 				if (isPrev(i, i + 1, j, j - 1, f, M)) {
-					// System.out.println("NFs "+f.getChain().get(i)+" has previous
-					// "+f.getChain().get(j));
+					 System.out.println("NFs "+f.getChain().get(i)+" has previous"+f.getChain().get(j));
 					if (!contains(vLinks, f.getChain().get(j), f.getChain().get(i)))
 						vLinks.add(new Tuple(f.getChain().get(j), f.getChain().get(i)));
 				}
@@ -124,12 +124,20 @@ public class Driver {
 
 	public static boolean isPrev(int i, int x, int j, int y, Flow f, int[][] M) {
 
-		if ((f.getChain().get(i) == f.getChain().get(y))
-		    && (M[f.getChain().get(i)][f.getChain().get(j)] == 1))
-			return true;
-		if ((f.getChain().get(j) == f.getChain().get(x))
-		    && (M[f.getChain().get(i)][f.getChain().get(j)] == 1))
-			return true;
+		System.out.println("i = "+f.getChain().get(i)+", x = "+f.getChain().get(x)+
+				", j = "+f.getChain().get(j)+", y = "+f.getChain().get(y));
+		if (f.getChain().get(i) == f.getChain().get(y)){
+		   if(M[f.getChain().get(i)][f.getChain().get(j)] == 1)
+			   return true;
+		   else
+			   return false;
+		}
+		if (f.getChain().get(j) == f.getChain().get(x)){
+		    if(M[f.getChain().get(i)][f.getChain().get(j)] == 1)
+		    	return true;
+		    else
+		    	return false;
+		}
 		if (M[f.getChain().get(j)][f.getChain().get(y)] == 1)
 			return isPrev(i, x, j, y - 1, f, M);
 		if (M[f.getChain().get(i)][f.getChain().get(x)] == 1)
@@ -189,7 +197,7 @@ public class Driver {
 		while (scanner.hasNextLine()) {
 			String line = scanner.nextLine();
 			String[] splitLine = line.split(",");
-			Flow f = new Flow(Integer.parseInt(splitLine[1]),
+			Flow f = new Flow(Integer.parseInt(splitLine[0]),Integer.parseInt(splitLine[1]),
 			    Integer.parseInt(splitLine[2]), Integer.parseInt(splitLine[3]));
 			for (int i = 4; i < splitLine.length; i++) {
 				f.getChain().add(Integer.parseInt(splitLine[i]));
