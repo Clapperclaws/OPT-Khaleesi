@@ -1,5 +1,8 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,7 +49,22 @@ public class Driver {
 		for (int i = 0; i < rcm.length; i++) {
 			System.out.println(Arrays.toString(rcm[i]));
 		}
-
+		// Clear all log files.
+		BufferedWriter costWriter = new BufferedWriter(
+		    new FileWriter(new File(logPrefix + ".cost")));
+		BufferedWriter nodePlacementWriter = new BufferedWriter(
+		    new FileWriter(new File(logPrefix + ".nmap")));
+		BufferedWriter linkPlacementWriter = new BufferedWriter(
+		    new FileWriter(new File(logPrefix + ".path")));
+		BufferedWriter linkSelectionWriter = new BufferedWriter(
+		    new FileWriter(new File(logPrefix + ".sequence")));
+		BufferedWriter durationWriter = new BufferedWriter(
+		    new FileWriter(new File(logPrefix + ".time")));
+		costWriter.close();
+		nodePlacementWriter.close();
+		linkPlacementWriter.close();
+		linkSelectionWriter.close();
+		durationWriter.close();
 		ILP model = new ILP();
 		for (int flowIdx = 0; flowIdx < flowsList.size(); ++flowIdx) {
 			ArrayList<Tuple> vLinks = generateE(flowsList.get(0), rcm);

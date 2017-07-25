@@ -126,7 +126,8 @@ public class ILP {
 			ArrayList<Tuple> selectedLinks = new ArrayList<Tuple>();
 			for (int i = 0; i < E.size(); i++) {
 				if (model.getValue(z[i]) >= 0.9) {
-					selectedLinks.add(E.get(i));
+					selectedLinks.add(new Tuple(getIndexNF(f, E.get(i).getSource()),
+					    getIndexNF(f, E.get(i).getDestination())));
 					System.out.println(
 					    "Z " + i + " = " + E.get(i) + " is routed through Path: ");
 					linkEmbedding.put(E.get(i), new ArrayList<Tuple>());
@@ -151,8 +152,8 @@ public class ILP {
 			linkSelectionWriter.append(Integer.toString(flowIdx));
 			for (int i = 0; i < embeddedSequence.size(); ++i) {
 				linkSelectionWriter.append("," + embeddedSequence.get(i));
-				nodePlacementWriter
-				    .append("," + nodePlacements.get(embeddedSequence.get(i)));
+				nodePlacementWriter.append(","
+				    + nodePlacements.get(f.getChain().get(embeddedSequence.get(i))));
 				System.out.print(embeddedSequence.get(i) + " ");
 			}
 			System.out.print("\n");
@@ -166,15 +167,16 @@ public class ILP {
 			ArrayList<Tuple> linkSequence = new ArrayList<Tuple>();
 			linkSequence.add(ingressToFirst);
 			for (int i = 1; i < embeddedSequence.size(); ++i) {
-				linkSequence.add(
-				    new Tuple(embeddedSequence.get(i - 1), embeddedSequence.get(i)));
+				linkSequence
+				    .add(new Tuple(f.getChain().get(embeddedSequence.get(i - 1)),
+				        f.getChain().get(embeddedSequence.get(i))));
 			}
 			linkSequence.add(egressToLast);
 			for (Tuple link : linkSequence) {
 				System.out.println(link);
 				Iterator<Tuple> it = linkEmbedding.keySet().iterator();
 				Tuple l = null;
-				while(it.hasNext()) {
+				while (it.hasNext()) {
 					l = it.next();
 					if (l.compareTo(link) == 0)
 						break;
@@ -182,7 +184,7 @@ public class ILP {
 				System.out.println(linkEmbedding.get(l));
 				ArrayList<Integer> path = ComputePath(linkEmbedding.get(l),
 				    G.getNodeCap().length);
-				if (path.size() > 0) 
+				if (path.size() > 0)
 					embeddedPath.addAll(path.subList(1, path.size()));
 			}
 			// ArrayList<Integer> embeddedPath = ComputePath(embeddingLinks,
