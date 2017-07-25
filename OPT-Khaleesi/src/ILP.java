@@ -8,14 +8,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.Stack;
 
 import ilog.concert.IloException;
 import ilog.concert.IloIntVar;
 import ilog.concert.IloNumExpr;
-import ilog.concert.IloNumVar;
-import ilog.concert.IloNumVarType;
 import ilog.cplex.IloCplex;
 
 public class ILP {
@@ -37,6 +34,8 @@ public class ILP {
 	public void runILP(Graph G, int[][] M, int flowIdx, Flow f,
 	    ArrayList<Tuple> E, int[] mbSpecs, String logPrefix)
 	    throws IloException, IOException {
+		System.out.print("Bazinga!!");
+		System.out.println(E);
 		IloCplex model = buildILP(G, M, f, E, mbSpecs);
 		model.exportModel("OPT-Khaleesi.lp");
 		BufferedWriter costWriter = new BufferedWriter(
@@ -82,17 +81,17 @@ public class ILP {
 			}
 			System.out.println("Path from Ingress to First NF");
 			ArrayList<Tuple> embeddingLinks = new ArrayList<Tuple>();
-			HashMap<Tuple, ArrayList<Tuple>> linkEmbedding = new HashMap<Tuple, ArrayList<Tuple>>();
+			HashMap<Integer, ArrayList<Tuple>> linkEmbedding = new HashMap<Integer, ArrayList<Tuple>>();
 			Tuple ingressToFirst = new Tuple(f.getSource(), firstNf);
 			for (int j = 0; j < G.getAdjList().length; j++) {
 				for (int k = 0; k < G.getAdjList().length; k++) {
 					try {
 						if (model.getValue(w[E.size()][j][k]) >= 0.9) {
 							embeddingLinks.add(new Tuple(j, k));
-							if (!linkEmbedding.containsKey(ingressToFirst)) {
-								linkEmbedding.put(ingressToFirst, new ArrayList<Tuple>());
+							if (!linkEmbedding.containsKey(E.size())) {
+								linkEmbedding.put(E.size(), new ArrayList<Tuple>());
 							}
-							ArrayList<Tuple> p = linkEmbedding.get(ingressToFirst);
+							ArrayList<Tuple> p = linkEmbedding.get(E.size());
 							p.add(new Tuple(j, k));
 							System.out.print("{" + j + "," + k + "},");
 						}
@@ -109,10 +108,10 @@ public class ILP {
 					try {
 						if (model.getValue(w[E.size() + 1][j][k]) >= 0.9) {
 							embeddingLinks.add(new Tuple(j, k));
-							if (!linkEmbedding.containsKey(egressToLast)) {
-								linkEmbedding.put(egressToLast, new ArrayList<Tuple>());
+							if (!linkEmbedding.containsKey(E.size() + 1)) {
+								linkEmbedding.put(E.size() + 1, new ArrayList<Tuple>());
 							}
-							ArrayList<Tuple> p = linkEmbedding.get(egressToLast);
+							ArrayList<Tuple> p = linkEmbedding.get(E.size() + 1);
 							p.add(new Tuple(j, k));
 							System.out.print("{" + j + "," + k + "},");
 						}
@@ -130,13 +129,13 @@ public class ILP {
 					    getIndexNF(f, E.get(i).getDestination())));
 					System.out.println(
 					    "Z " + i + " = " + E.get(i) + " is routed through Path: ");
-					linkEmbedding.put(E.get(i), new ArrayList<Tuple>());
+					linkEmbedding.put(i, new ArrayList<Tuple>());
 					for (int j = 0; j < G.getAdjList().length; j++) {
 						for (int k = 0; k < G.getAdjList().length; k++) {
 							try {
 								if (model.getValue(w[i][j][k]) > 0) {
 									embeddingLinks.add(new Tuple(j, k));
-									ArrayList<Tuple> p = linkEmbedding.get(E.get(i));
+									ArrayList<Tuple> p = linkEmbedding.get(i);
 									p.add(new Tuple(j, k));
 									System.out.print("{" + j + "," + k + "},");
 								}
@@ -147,13 +146,17 @@ public class ILP {
 					System.out.println();
 				}
 			}
+			System.out.println("Selected z_es: ");
+			for (Tuple link : selectedLinks) {
+				System.out.println(link);
+			}
 			ArrayList<Integer> embeddedSequence = ComputePath(selectedLinks,
 			    f.getChain().size());
 			linkSelectionWriter.append(Integer.toString(flowIdx));
 			for (int i = 0; i < embeddedSequence.size(); ++i) {
 				linkSelectionWriter.append("," + embeddedSequence.get(i));
-				nodePlacementWriter.append(","
-				    + nodePlacements.get(f.getChain().get(embeddedSequence.get(i))));
+				nodePlacementWriter
+				    .append("," + nodePlacements.get(embeddedSequence.get(i)));
 				System.out.print(embeddedSequence.get(i) + " ");
 			}
 			System.out.print("\n");
@@ -164,32 +167,35 @@ public class ILP {
 
 			ArrayList<Integer> embeddedPath = new ArrayList<Integer>();
 			embeddedPath.add(f.getSource());
-			ArrayList<Tuple> linkSequence = new ArrayList<Tuple>();
-			linkSequence.add(ingressToFirst);
+			ArrayList<Integer> linkSequence = new ArrayList<Integer>();
+			linkSequence.add(E.size());
+			// linkSequence.add(ingressToFirst);
 			for (int i = 1; i < embeddedSequence.size(); ++i) {
-				linkSequence
-				    .add(new Tuple(f.getChain().get(embeddedSequence.get(i - 1)),
-				        f.getChain().get(embeddedSequence.get(i))));
+				int vlindex = getVLinkIndex(
+				    f.getChain().get(embeddedSequence.get(i - 1)),
+				    f.getChain().get(embeddedSequence.get(i)), E);
+				linkSequence.add(vlindex);
 			}
-			linkSequence.add(egressToLast);
-			for (Tuple link : linkSequence) {
-				System.out.println(link);
-				Iterator<Tuple> it = linkEmbedding.keySet().iterator();
-				Tuple l = null;
+			linkSequence.add(E.size() + 1);
+			System.out.println("Link sequence:");
+			for (Integer linkIdx : linkSequence) {
+				Iterator<Integer> it = linkEmbedding.keySet().iterator();
+				Integer l = null;
 				while (it.hasNext()) {
 					l = it.next();
-					if (l.compareTo(link) == 0)
+					if (l == linkIdx)
 						break;
 				}
-				System.out.println(linkEmbedding.get(l));
 				ArrayList<Integer> path = ComputePath(linkEmbedding.get(l),
 				    G.getNodeCap().length);
+				System.out.println(path);
 				if (path.size() > 0)
 					embeddedPath.addAll(path.subList(1, path.size()));
 			}
 			// ArrayList<Integer> embeddedPath = ComputePath(embeddingLinks,
 			// G.getNodeCap().length);
 			linkPlacementWriter.append(Integer.toString(flowIdx));
+			System.out.println("Embedded path:");
 			for (int i = 0; i < embeddedPath.size(); ++i) {
 				linkPlacementWriter.append("," + embeddedPath.get(i));
 				System.out.print(embeddedPath.get(i) + " ");
@@ -215,7 +221,8 @@ public class ILP {
 		HashMap<Integer, Integer> indegree = new HashMap<Integer, Integer>();
 		if (links == null || links.size() <= 0)
 			return path;
-
+		// System.out.println("numTotalNodes = " + numTotalNodes);
+		// System.out.println(links);
 		for (int i = 0; i < numTotalNodes; ++i)
 			adj.add(new ArrayList<Integer>());
 		for (int i = 0; i < links.size(); ++i) {
@@ -304,9 +311,13 @@ public class ILP {
 		for (int i = 0; i < E.size(); i++) {
 			System.out
 			    .println(E.get(i).getSource() + "," + E.get(i).getDestination());
-			if ((M[E.get(i).getSource()][E.get(i).getDestination()]) == 1)
-				Omega[getIndexNF(f, E.get(i).getSource())][getIndexNF(f,
-				    E.get(i).getDestination())] = 1;
+			if ((M[E.get(i).getSource()][E.get(i).getDestination()]) == 1) {
+				int u = getIndexNF(f, E.get(i).getSource());
+				int v = getIndexNF(f, E.get(i).getDestination());
+				System.out.println(E.get(i).getSource() + "/" + u + "::"
+				    + E.get(i).getDestination() + "/" + v);
+				Omega[u][v] = 1;
+			}
 		}
 
 		// Print Omega for Testing
@@ -318,7 +329,6 @@ public class ILP {
 		for (int i = 0; i < Omega.length; i++) {
 			System.out.print(i + "   ");
 			for (int j = 0; j < Omega[i].length; j++) {
-
 				System.out.print(Omega[i][j] + ", ");
 			}
 			System.out.println();
