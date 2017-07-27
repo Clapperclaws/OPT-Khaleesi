@@ -182,7 +182,7 @@ def get_embedding_cost(cost_file, flow_id):
     ret = -1
     try:
         with open(cost_file) as f:
-            for line in f:
+            for line in reversed(f.readlines()):
                 tokens = line.strip("\n\r").split(",")
                 if int(tokens[0]) == int(flow_id):
                     ret = float(tokens[1])
@@ -219,14 +219,17 @@ def main():
 
     with open(args.simulation_plan, "r") as f:
         for line in f:
-            tokens = line.split(",")
+            tokens = line.strip("\n\r").split(",")
             ts = int(tokens[0])
             end_time = int(tokens[1])
+            # print end_time
             flow_id = tokens[2].rstrip("\n")
             e = Event(ts, "arrival", flow_id)
+            # print e.debug_string()
             heapq.heappush(event_queue, e)
             if end_time <= args.max_simulation_time:
                 e = Event(end_time, "departure", flow_id)
+                # print e.debug_string()
                 heapq.heappush(event_queue, e)
     sn = load_csv_graph(args.sn_topology_file)
     util_matrix = {}
