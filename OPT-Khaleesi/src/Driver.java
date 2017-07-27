@@ -29,7 +29,6 @@ public class Driver {
 
 	public static void main(String[] args) throws IOException, IloException {
 		HashMap<String, String> parsedArgs = ParseArgs(args);
-
 		// Read Substrate Network
 		Graph substrateNetwork = ReadTopology(parsedArgs.get("--sn_topology_file"),
 		    -1);
@@ -66,7 +65,9 @@ public class Driver {
 		linkSelectionWriter.close();
 		durationWriter.close();
 		ILP model = new ILP();
-		for (int flowIdx = 0; flowIdx < flowsList.size(); ++flowIdx) {
+		// int startFlowIndex = 0, endFlowIndex = flowsList.size() - 1;
+		int startFlowIndex = 176, endFlowIndex = 176;
+		for (int flowIdx = startFlowIndex; flowIdx <= endFlowIndex; ++flowIdx) {
 			ArrayList<Tuple> vLinks = generateE(flowsList.get(flowIdx), rcm);
 			System.out.println(vLinks);
 			model.runILP(substrateNetwork, rcm, flowIdx, flowsList.get(flowIdx),
