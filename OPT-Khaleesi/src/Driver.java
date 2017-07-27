@@ -32,40 +32,46 @@ public class Driver {
 		// Read Substrate Network
 		Graph substrateNetwork = ReadTopology(parsedArgs.get("--sn_topology_file"),
 		    -1);
-		System.out.println("Substrate Network \n" + substrateNetwork);
+		//System.out.println("Substrate Network \n" + substrateNetwork);
 
 		// Read List of Flows
 		ArrayList<Flow> flowsList = ReadFlows(parsedArgs.get("--flows_file"));
-		System.out.println("List of Flows: \n" + flowsList);
+		//System.out.println("List of Flows: \n" + flowsList);
 
 		// Read Middlebox Specs
 		int[] mbSpecs = ReadMBSpecs(parsedArgs.get("--mbox_spec_file"));
-		System.out.println("MB demands \n" + Arrays.toString(mbSpecs));
+		//System.out.println("MB demands \n" + Arrays.toString(mbSpecs));
 		String logPrefix = parsedArgs.get("--log_prefix");
 		// Read RCM
 		int[][] rcm = ReadRCM(parsedArgs.get("--rcm_file"), mbSpecs.length);
-		System.out.print("ReadOrderCompatibilityMatrix \n");
+		//System.out.print("ReadOrderCompatibilityMatrix \n");
 		for (int i = 0; i < rcm.length; i++) {
 			System.out.println(Arrays.toString(rcm[i]));
 		}
 		// Clear all log files.
-		BufferedWriter costWriter = new BufferedWriter(
-		    new FileWriter(new File(logPrefix + ".cost")));
-		BufferedWriter nodePlacementWriter = new BufferedWriter(
-		    new FileWriter(new File(logPrefix + ".nmap")));
-		BufferedWriter linkPlacementWriter = new BufferedWriter(
-		    new FileWriter(new File(logPrefix + ".path")));
-		BufferedWriter linkSelectionWriter = new BufferedWriter(
-		    new FileWriter(new File(logPrefix + ".sequence")));
-		BufferedWriter durationWriter = new BufferedWriter(
-		    new FileWriter(new File(logPrefix + ".time")));
-		costWriter.close();
-		nodePlacementWriter.close();
-		linkPlacementWriter.close();
-		linkSelectionWriter.close();
-		durationWriter.close();
+		//		BufferedWriter costWriter = new BufferedWriter(
+		//		    new FileWriter(new File(logPrefix + ".cost")));
+		//		BufferedWriter nodePlacementWriter = new BufferedWriter(
+		//		    new FileWriter(new File(logPrefix + ".nmap")));
+		//		BufferedWriter linkPlacementWriter = new BufferedWriter(
+		//		    new FileWriter(new File(logPrefix + ".path")));
+		//		BufferedWriter linkSelectionWriter = new BufferedWriter(
+		//		    new FileWriter(new File(logPrefix + ".sequence")));
+		//		BufferedWriter durationWriter = new BufferedWriter(
+		//		    new FileWriter(new File(logPrefix + ".time")));
+		//		costWriter.close();
+		//		nodePlacementWriter.close();
+		//		linkPlacementWriter.close();
+		//		linkSelectionWriter.close();
+		//		durationWriter.close();
 		ILP model = new ILP();
 		int startFlowIndex = 0, endFlowIndex = flowsList.size() - 1;
+		if (parsedArgs.get("--start_index") != null) {
+			startFlowIndex = Integer.parseInt(parsedArgs.get("--start_index"));
+		}
+		if (parsedArgs.get("--end_index") != null) {
+			endFlowIndex = Integer.parseInt(parsedArgs.get("--end_index"));
+		}
 		// int startFlowIndex = 176, endFlowIndex = 176;
 		for (int flowIdx = startFlowIndex; flowIdx <= endFlowIndex; ++flowIdx) {
 			ArrayList<Tuple> vLinks = generateE(flowsList.get(flowIdx), rcm);

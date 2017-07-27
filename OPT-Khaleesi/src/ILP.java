@@ -35,7 +35,7 @@ public class ILP {
 	    ArrayList<Tuple> E, int[] mbSpecs, String logPrefix)
 	    throws IloException, IOException {
 		System.out.print("Bazinga!!");
-		System.out.println(E);
+		// System.out.println(E);
 		IloCplex model = buildILP(G, M, f, E, mbSpecs);
 		model.exportModel("OPT-Khaleesi.lp");
 		BufferedWriter costWriter = new BufferedWriter(
@@ -44,6 +44,8 @@ public class ILP {
 		    new FileWriter(new File(logPrefix + ".nmap"), true));
 		BufferedWriter linkPlacementWriter = new BufferedWriter(
 		    new FileWriter(new File(logPrefix + ".path"), true));
+		BufferedWriter emapWriter = new BufferedWriter(
+		    new FileWriter(new File(logPrefix + ".emap"), true));
 		BufferedWriter linkSelectionWriter = new BufferedWriter(
 		    new FileWriter(new File(logPrefix + ".sequence"), true));
 		BufferedWriter durationWriter = new BufferedWriter(
@@ -51,13 +53,13 @@ public class ILP {
 		int start = (int) System.currentTimeMillis();
 		if (model.solve()) {
 			int finish = (int) System.currentTimeMillis();
-			System.out.println("Duration = " + (finish - start));
+			// System.out.println("Duration = " + (finish - start));
 			durationWriter.append(flowIdx + "," + (finish - start) + "\n");
 			durationWriter.flush();
-			System.out.println("Optimal Solution = " + model.getObjValue());
+			// System.out.println("Optimal Solution = " + model.getObjValue());
 			costWriter.append(flowIdx + "," + model.getObjValue() + "\n");
 			costWriter.flush();
-			System.out.println("NF Placements");
+			// System.out.println("NF Placements");
 			nodePlacementWriter.append(Integer.toString(flowIdx));
 			nodePlacementWriter.flush();
 			ArrayList<Integer> nodePlacements = new ArrayList<Integer>();
@@ -65,24 +67,25 @@ public class ILP {
 			for (int i = 0; i < f.getChain().size(); i++) {
 				for (int j = 0; j < G.getAdjList().length; j++) {
 					if (model.getValue(theta[i][j]) >= 0.9) {
-						System.out.println("NF " + i + " of type " + f.getChain().get(i)
-						    + " is placed on Node " + j);
+						// System.out.println("NF " + i + " of type " + f.getChain().get(i)
+						//     + " is placed on Node " + j);
 						nodePlacements.add(j);
 						if (model.getValue(o[i][j]) >= 0.9) {
 							firstNf = i;
-							System.out.println("*This is the first NF*");
+							// System.out.println("*This is the first NF*");
 						}
 						if (model.getValue(t[i][j]) >= 0.9) {
 							lastNf = i;
-							System.out.println("*This is the last NF*");
+							// System.out.println("*This is the last NF*");
 						}
 					}
 				}
 			}
-			System.out.println("Path from Ingress to First NF");
+			// System.out.println("Path from Ingress to First NF");
 			ArrayList<Tuple> embeddingLinks = new ArrayList<Tuple>();
 			HashMap<Integer, ArrayList<Tuple>> linkEmbedding = new HashMap<Integer, ArrayList<Tuple>>();
 			Tuple ingressToFirst = new Tuple(f.getSource(), firstNf);
+			emapWriter.append(Integer.toString(flowIdx));
 			for (int j = 0; j < G.getAdjList().length; j++) {
 				for (int k = 0; k < G.getAdjList().length; k++) {
 					try {
@@ -93,16 +96,16 @@ public class ILP {
 							}
 							ArrayList<Tuple> p = linkEmbedding.get(E.size());
 							p.add(new Tuple(j, k));
-							System.out.print("{" + j + "," + k + "},");
+							// System.out.print("{" + j + "," + k + "},");
 						}
 					} catch (IloException e) {
 					}
 				}
 			}
-			System.out.println();
+			// System.out.println();
 
 			Tuple egressToLast = new Tuple(lastNf, f.getDestination());
-			System.out.println("Path from Last NF to Egress");
+			// System.out.println("Path from Last NF to Egress");
 			for (int j = 0; j < G.getAdjList().length; j++) {
 				for (int k = 0; k < G.getAdjList().length; k++) {
 					try {
@@ -119,16 +122,16 @@ public class ILP {
 					}
 				}
 			}
-			System.out.println();
+			// System.out.println();
 
-			System.out.println("Chosen E Links");
+			// System.out.println("Chosen E Links");
 			ArrayList<Tuple> selectedLinks = new ArrayList<Tuple>();
 			for (int i = 0; i < E.size(); i++) {
 				if (model.getValue(z[i]) >= 0.9) {
 					selectedLinks.add(new Tuple(getIndexNF(f, E.get(i).getSource()),
 					    getIndexNF(f, E.get(i).getDestination())));
-					System.out.println(
-					    "Z " + i + " = " + E.get(i) + " is routed through Path: ");
+					// System.out.println(
+					//     "Z " + i + " = " + E.get(i) + " is routed through Path: ");
 					linkEmbedding.put(i, new ArrayList<Tuple>());
 					for (int j = 0; j < G.getAdjList().length; j++) {
 						for (int k = 0; k < G.getAdjList().length; k++) {
@@ -143,13 +146,20 @@ public class ILP {
 							}
 						}
 					}
-					System.out.println();
+					// System.out.println();
 				}
 			}
-			System.out.println("Selected z_es: ");
-			for (Tuple link : selectedLinks) {
-				System.out.println(link);
+			for (Tuple sLink : embeddingLinks) {
+				emapWriter.append(
+				    "," + sLink.getSource() + "," + sLink.getDestination());
+				emapWriter.flush();
 			}
+			emapWriter.append("\n");
+			
+			// System.out.println("Selected z_es: ");
+			// for (Tuple link : selectedLinks) {
+			// 	System.out.println(link);
+			// }
 			ArrayList<Integer> embeddedSequence = ComputePath(selectedLinks,
 			    f.getChain().size());
 			linkSelectionWriter.append(Integer.toString(flowIdx));
@@ -177,7 +187,7 @@ public class ILP {
 				linkSequence.add(vlindex);
 			}
 			linkSequence.add(E.size() + 1);
-			System.out.println("Link sequence:");
+			// System.out.println("Link sequence:");
 			for (Integer linkIdx : linkSequence) {
 				Iterator<Integer> it = linkEmbedding.keySet().iterator();
 				Integer l = null;
@@ -188,28 +198,31 @@ public class ILP {
 				}
 				ArrayList<Integer> path = ComputePath(linkEmbedding.get(l),
 				    G.getNodeCap().length);
-				System.out.println(path);
+				// System.out.println(path);
 				if (path.size() > 0)
 					embeddedPath.addAll(path.subList(1, path.size()));
 			}
 			// ArrayList<Integer> embeddedPath = ComputePath(embeddingLinks,
 			// G.getNodeCap().length);
 			linkPlacementWriter.append(Integer.toString(flowIdx));
-			System.out.println("Embedded path:");
+			// System.out.println("Embedded path:");
 			for (int i = 0; i < embeddedPath.size(); ++i) {
 				linkPlacementWriter.append("," + embeddedPath.get(i));
-				System.out.print(embeddedPath.get(i) + " ");
+				// System.out.print(embeddedPath.get(i) + " ");
 			}
-			System.out.print("\n");
+			// System.out.print("\n");
 			linkPlacementWriter.append("\n");
 			linkPlacementWriter.flush();
-		} else
-			System.out.println("No Solution Found!");
+		} else {
+			costWriter.append(flowIdx + ",-1\n");
+			// System.out.println("No Solution Found!");
+		}
 		costWriter.close();
 		nodePlacementWriter.close();
 		linkPlacementWriter.close();
 		linkSelectionWriter.close();
 		durationWriter.close();
+		emapWriter.close();
 	}
 
 	// This function computes the eulerian path from a set of links. This function
@@ -292,14 +305,14 @@ public class ILP {
 			}
 		}
 		// For Testing Purpose - Print Substrate Link Matrix
-		System.out.println("Substrate Links Matrix");
-		for (int i = 0; i < G.getAdjList().length; i++) {
-			for (int j = 0; j < G.getAdjList().length; j++) {
-				System.out.print(isSubstrateLink[i][j] + ",");
-			}
-			System.out.println();
-		}
-		System.out.println();
+		// System.out.println("Substrate Links Matrix");
+		// for (int i = 0; i < G.getAdjList().length; i++) {
+		// for (int j = 0; j < G.getAdjList().length; j++) {
+		// System.out.print(isSubstrateLink[i][j] + ",");
+		// }
+		// System.out.println();
+		// }
+		// System.out.println();
 
 		// Omega is populated by NF index and not NF type
 		int[][] Omega = new int[numNFs][numNFs]; // Omega = C || !C ^ M ^ E
@@ -320,19 +333,19 @@ public class ILP {
 			}
 		}
 
-		// Print Omega for Testing
-		System.out.println("Omega");
-		System.out.print("    ");
-		for (int i = 0; i < Omega.length; i++)
-			System.out.print(i + "  ");
-		System.out.println();
-		for (int i = 0; i < Omega.length; i++) {
-			System.out.print(i + "   ");
-			for (int j = 0; j < Omega[i].length; j++) {
-				System.out.print(Omega[i][j] + ", ");
-			}
-			System.out.println();
-		}
+		// // Print Omega for Testing
+		// System.out.println("Omega");
+		// System.out.print(" ");
+		// for (int i = 0; i < Omega.length; i++)
+		// System.out.print(i + " ");
+		// System.out.println();
+		// for (int i = 0; i < Omega.length; i++) {
+		// System.out.print(i + " ");
+		// for (int j = 0; j < Omega[i].length; j++) {
+		// System.out.print(Omega[i][j] + ", ");
+		// }
+		// System.out.println();
+		// }
 
 		// Mathematical Model
 		IloCplex model = new IloCplex();
@@ -622,7 +635,6 @@ public class ILP {
 					}
 				}
 			}
-
 		}
 		// Constraint # 13 - Do not violate any invariants
 		for (int i = 0; i < numNFs; i++) {
