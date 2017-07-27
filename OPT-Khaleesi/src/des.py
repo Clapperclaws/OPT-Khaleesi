@@ -31,8 +31,8 @@ def execute_one_experiment(executable, sn_topology_file, flows_file,
     cplex_root = os.environ['CPLEX_ROOT']
     jvm_args = "-Djava.library.path=" + cplex_root + "/cplex/bin/x86-64_sles10_4.1/"
     classpath = os.getcwd() + ":" + cplex_root + "/cplex/lib/cplex.jar"
-    print "jvm_args: " + jvm_args + "\n"
-    print "-classpath: " + classpath + "\n"
+    # print "jvm_args: " + jvm_args + "\n"
+    # print "-classpath: " + classpath + "\n"
     process = subprocess.Popen(["java", jvm_args, "-classpath", classpath,
                                 executable, '--sn_topology_file=' + sn_topology_file, '--flows_file=' +
                                 flows_file, '--mbox_spec_file=' + mbox_spec_file, '--rcm_file=' +
@@ -70,10 +70,10 @@ def load_csv_graph(topology_file):
     g = nx.Graph()
     with open(topology_file, "r") as f:
         line = f.readline().strip("\n\r")
-        print line
+        # print line
         tokens = line.split(",")
         num_nodes, num_edges = int(tokens[0]), int(tokens[1])
-        print num_nodes
+        # print num_nodes
         for i in range(0, num_nodes):
             line = f.readline().strip("\n\r")
             tokens = line.split(",")
@@ -107,6 +107,13 @@ def write_util_matrix(sn, util_matrix, out_file):
             if util > 0:
                 f.write(",".join([str(key[0]), str(key[1]), str(util)]) + "\n")
 
+def write_server_util(sn, node_util, out_file):
+    with open(out_file, "w") as f:
+        for (k, v) in node_util.iteritems():
+            if v > 0:
+                util = float(v / 8.0)
+                f.write(",".join([str(k), str(util)]) + "\n")
+
 def update_graph_capacity(sn, traffic_request, flow_id, mbox_spec, nmap_file,
         emap_file, seq_file, util_matrix, node_util, increase = True):
     sign = 1
@@ -131,20 +138,19 @@ def update_graph_capacity(sn, traffic_request, flow_id, mbox_spec, nmap_file,
                 break
 
     if len(placement) > 0:
-        print placement
-        print sequence
-        print mbox_spec
+        # print placement
+        # print sequence
+        # print mbox_spec
         for i in range(0, len(placement)):
             idx = sequence[i]
-            print flow_id, idx
+            # print flow_id, idx
             ftype = int(traffic_request[int(flow_id)].mbox_seq[int(idx)])
             cpu_req = mbox_spec[ftype]
             server_id = placement[i]
-            print "Updating server " + str(server_id) + " with VNF " + str(idx) + " of type " + str(ftype) + " w. req. " + str(cpu_req)
+            # print "Updating server " + str(server_id) + " with VNF " + str(idx) + " of type " + str(ftype) + " w. req. " + str(cpu_req)
             for node in sn.nodes(data = "all"):
                 if node[0] == server_id:
                     node[1]['cpu'] += (sign * cpu_req)
-                    print node
                     break
             node_util[server_id] += (-sign * cpu_req)
 
@@ -177,7 +183,6 @@ def get_embedding_cost(cost_file, flow_id):
     try:
         with open(cost_file) as f:
             for line in f:
-                print line
                 tokens = line.strip("\n\r").split(",")
                 if int(tokens[0]) == int(flow_id):
                     ret = float(tokens[1])
@@ -246,14 +251,15 @@ def main():
             # nothing. This can be checked by reading from $(flow_id).status file.
             # If there was a successful embedding increase graph's capacity.
             cost = get_embedding_cost(args.log_prefix + ".cost", flow_id)
-            print cost
+            # print cost
             if cost <> -1:
                 sn = update_graph_capacity(sn, traffic_requests, flow_id,
                         mbox_specs, args.log_prefix + ".nmap", args.log_prefix + ".emap",
                         args.log_prefix + ".sequence", util_matrix, node_util,
                         increase = True)
                 write_csv_graph(sn, args.sn_topology_file)
-                # write_util_matrix(sn, util_matrix, "sim-data/util-data/util." + str(e.ts))
+                write_util_matrix(sn, util_matrix, "sim-data/util-data/util." + str(e.ts))
+                write_server_util(sn, node_util, "sim-data/util-data/sutil." +  str(e.ts))
         elif e.etype == "arrival":
             # run embedding first. if embedding is successful decrease the
             # capacity of SN. Otherwise do nothing.
@@ -265,14 +271,15 @@ def main():
                     args.flows_file, args.mbox_spec_file, args.rcm_file,
                     args.log_prefix, e.flow_id, e.flow_id)
             cost = get_embedding_cost(args.log_prefix + ".cost", flow_id)
-            print "Cost: " + str(cost) + "\n"
+            # print "Cost: " + str(cost) + "\n"
             if cost <> -1:
                 sn = update_graph_capacity(sn, traffic_requests, flow_id,
                         mbox_specs, args.log_prefix + ".nmap", args.log_prefix + ".emap",
                         args.log_prefix + ".sequence", util_matrix, node_util,
                         increase = False)
                 write_csv_graph(sn, args.sn_topology_file)
-                # write_util_matrix(sn, util_matrix, "sim-data/util-data/util." + str(e.ts))
+                write_util_matrix(sn, util_matrix, "sim-data/util-data/util." + str(e.ts))
+                write_server_util(sn, node_util, "sim-data/util-data/sutil." +  str(e.ts))
                 accepted += 1
             with open("sim-data/sim-results", "a") as f:
                 f.write(",".join([str(e.ts),str(total_flows), str(accepted)]) + "\n")
